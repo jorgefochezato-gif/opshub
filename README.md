@@ -29,4 +29,4 @@ The project will be developed using production-oriented engineering practices:
 - Docker
 - Infrastructure as code
 - Security scanning
-- Automated deployments
+- Automated deploymentsBranch protection test
