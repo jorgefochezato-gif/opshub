@@ -30,3 +30,4 @@ The project will be developed using production-oriented engineering practices:
 - Infrastructure as code
 - Security scanning
 - Automated deploymentsBranch protection test
+Testing protected main
