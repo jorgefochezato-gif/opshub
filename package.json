@@ -1,0 +1,8 @@
+{
+  "name": "opshub",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "devDependencies": {
+    "turbo": "^2.10.11"
+  }
+}
