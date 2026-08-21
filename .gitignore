@@ -24,3 +24,4 @@ terraform/.terraform/
 
 .DS_Store
 Thumbs.db
+.turbo/

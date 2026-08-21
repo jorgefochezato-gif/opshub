@@ -2,7 +2,11 @@
   "name": "opshub",
   "private": true,
   "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "typecheck": "turbo run typecheck"
+  },
   "devDependencies": {
-    "turbo": "^2.10.11"
+    "turbo": "^2.10.11",
+    "typescript": "^7.0.2"
   }
 }

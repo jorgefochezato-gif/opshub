@@ -1,5 +1,9 @@
 {
- "name": "@opshub/config",
- "version": "0.1.0",
- "private": true
+  "name": "@opshub/config",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc"
+  }
 }
