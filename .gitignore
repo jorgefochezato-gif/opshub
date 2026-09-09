@@ -25,3 +25,6 @@ terraform/.terraform/
 .DS_Store
 Thumbs.db
 .turbo/
+
+# Local database backups
+backups/
