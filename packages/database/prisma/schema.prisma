@@ -84,4 +84,5 @@ model Task {
 
   @@index([projectId])
   @@index([projectId, status])
+  @@index([projectId, createdAt(sort: Desc), id(sort: Desc)])
 }
