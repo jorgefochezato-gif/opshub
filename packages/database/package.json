@@ -1,0 +1,18 @@
+{
+  "name": "@opshub/database",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "7.10.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "prisma": "7.10.0"
+  }
+}
