@@ -1,704 +1,272 @@
 # OpsHub
 
-Production-style multi-tenant SaaS engineering project.
+Production-style multi-tenant SaaS engineering project built incrementally through a 20-phase execution roadmap.
 
 ## Purpose
 
-OpsHub is a learning and portfolio project designed to exercise production-oriented software engineering practices across:
+OpsHub is a learning and portfolio project for practicing production-oriented software engineering across full-stack development, backend engineering, database design, testing, security, CI/CD, infrastructure, observability, reliability, and AI integration.
 
-- Full-stack development
-- Backend engineering
-- Database design
-- Testing
-- Security
-- CI/CD
-- Infrastructure as code
-- Cloud deployment
-- Observability
-- Reliability engineering
-- AI integration
-
-The project is developed incrementally through defined engineering phases.
-
-## Engineering Goals
-
-The project will be developed using production-oriented engineering practices:
-
-- GitHub pull requests
-- Protected `main` branch
-- Automated testing
-- CI/CD
-- Docker
-- Infrastructure as code
-- Security scanning
-- Automated deployments
-
-The goal is not only to build a working application, but also to demonstrate a disciplined software engineering workflow.
-
----
+The project emphasizes both working software and a disciplined delivery process: each meaningful change is tracked in GitHub, developed on a branch, validated automatically, reviewed in a pull request, and merged through the protected `main` branch.
 
 ## Current Status
 
-The project is currently in:
+**Phase 2 — Relational Data Model & Database Foundation is complete. Phase 3 has not started.**
 
-**Phase 1 — Repository & Development Foundation**
+Released work:
 
-The foundation currently includes:
+| Phase                                                 | Status | Tracking                                                          | Release                                                      |
+| ----------------------------------------------------- | ------ | ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| Phase 1 — Repository & Development Foundation         | Done   | [Issue #3](https://github.com/jorgefochezato-gif/opshub/issues/3) | [PR #4](https://github.com/jorgefochezato-gif/opshub/pull/4) |
+| Phase 2 — Relational Data Model & Database Foundation | Done   | [Issue #5](https://github.com/jorgefochezato-gif/opshub/issues/5) | [PR #6](https://github.com/jorgefochezato-gif/opshub/pull/6) |
 
-- GitHub repository
-- Protected `main` branch
-- Git feature-branch workflow
-- pnpm workspace
-- Turborepo task orchestration
-- TypeScript strict mode
-- ESLint
-- Prettier
-- Initial application and shared-package structure
-- Environment variable template
-- Repository-level development scripts
+The delivery roadmap is tracked in the [OpsHub Engineering Roadmap project](https://github.com/users/jorgefochezato-gif/projects/1).
 
----
+### Implemented
+
+- Protected `main` branch and pull-request workflow
+- pnpm monorepo with Turborepo orchestration
+- Strict TypeScript, ESLint, and Prettier standards
+- GitHub Actions quality gate for pull requests and pushes to `main`
+- PostgreSQL 17 local service through Docker Compose
+- Prisma 7 relational schema and ordered migrations
+- Multi-tenant organization, user, membership, project, and task model
+- Database-enforced foreign keys, uniqueness constraints, timestamps, and access-pattern indexes
+- Deterministic, repeatable development seed
+- Representative Prisma queries with offset and cursor pagination
+- Measured query-plan analysis and an optimized task-pagination index
+- Documented and validated local backup-and-restore workflow
+
+### Not Yet Implemented
+
+The `apps/api` and `apps/web` workspaces are currently typed application skeletons. Runtime API endpoints, authentication, authorization, request validation, the web interface, and later production infrastructure belong to subsequent roadmap phases and are not represented as complete.
 
 ## Repository Structure
 
 ```text
 opshub/
-│
+├── .github/
+│   └── workflows/
+│       └── ci.yml                         # Pull-request and main quality gate
 ├── apps/
-│   ├── api/                    # Backend application
-│   │   ├── src/
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   │
-│   └── web/                    # Web application
-│       ├── src/
-│       ├── package.json
-│       └── tsconfig.json
-│
+│   ├── api/                               # Backend application skeleton
+│   └── web/                               # Web application skeleton
 ├── packages/
-│   ├── config/                 # Shared configuration
-│   │   ├── src/
-│   │   ├── package.json
-│   │   └── tsconfig.json
-│   │
-│   └── types/                  # Shared TypeScript types
-│       ├── src/
-│       ├── package.json
-│       └── tsconfig.json
-│
-├── docs/                       # Project documentation
-├── tests/                      # Cross-project tests
-│
-├── .env.example                # Environment variable template
-├── .editorconfig               # Editor configuration
-├── .gitignore                  # Git ignore rules
-├── .prettierignore             # Prettier exclusions
-├── eslint.config.mjs           # ESLint configuration
-├── prettier.config.mjs         # Prettier configuration
-├── pnpm-workspace.yaml         # pnpm workspace definition
-├── tsconfig.base.json          # Shared TypeScript configuration
-├── turbo.json                  # Turborepo task configuration
-├── package.json                # Root project configuration
-└── pnpm-lock.yaml              # Dependency lockfile
+│   ├── config/                            # Shared configuration package
+│   ├── database/                          # Prisma schema, migrations, seed, and queries
+│   └── types/                             # Shared TypeScript types
+├── docs/
+│   └── architecture/                      # Architecture and database documentation
+├── tests/                                 # Cross-project test location
+├── .env.example                           # Local environment template
+├── docker-compose.yml                     # Local PostgreSQL service
+├── eslint.config.mjs                      # Repository ESLint configuration
+├── prettier.config.mjs                    # Repository formatting standard
+├── pnpm-workspace.yaml                    # Workspace definition
+├── tsconfig.base.json                     # Shared strict TypeScript configuration
+├── turbo.json                             # Task graph and caching rules
+├── CONTRIBUTING.md                        # Contribution and release workflow
+├── package.json                           # Root validation commands
+└── pnpm-lock.yaml                         # Reproducible dependency lockfile
 ```
-
----
 
 ## Architecture
 
-OpsHub is organized as a monorepo.
-
-At the current foundation stage, the repository contains two applications and shared packages:
+OpsHub is organized as a monorepo with application workspaces and reusable packages. The relational data foundation is implemented, but it is not yet connected to runtime API endpoints.
 
 ```text
-                    ┌─────────────────────┐
-                    │       GitHub        │
-                    │  Protected main     │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │      OpsHub         │
-                    │      Monorepo       │
-                    └──────────┬──────────┘
-                               │
-              ┌────────────────┼────────────────┐
-              │                │                │
-              ▼                ▼                ▼
-       ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-       │  apps/web   │  │  apps/api   │  │  packages/  │
-       │             │  │             │  │             │
-       │ Web client  │  │ Backend API │  │ Shared code │
-       └─────────────┘  └─────────────┘  └─────────────┘
-                                              │
-                                      ┌───────┴───────┐
-                                      ▼               ▼
-                               ┌────────────┐  ┌────────────┐
-                               │   config   │  │   types    │
-                               └────────────┘  └────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                     OpsHub monorepo                      │
+├───────────────────────┬──────────────────────────────────┤
+│ Applications          │ Shared packages                  │
+│                       │                                  │
+│ apps/web              │ packages/types                  │
+│ apps/api              │ packages/config                 │
+│                       │ packages/database               │
+└───────────────────────┴─────────────────┬────────────────┘
+                                          │ Prisma
+                                          ▼
+                               ┌─────────────────────┐
+                               │   PostgreSQL 17     │
+                               │   Docker Compose    │
+                               └─────────────────────┘
 ```
 
-A more detailed architecture will be maintained under:
-
-```text
-docs/architecture/
-```
-
-as the system evolves.
-
----
+See [docs/architecture/README.md](docs/architecture/README.md) for the current system boundaries and [docs/architecture/database-design.md](docs/architecture/database-design.md) for the Phase 2 relational model.
 
 ## Prerequisites
 
-The current development environment requires:
+- Node.js 22
+- pnpm 10.15.0
+- Docker with Docker Compose
+- Git
 
-- Node.js 22+
-- pnpm 10+
-
-Verify the installed versions:
+Verify the main tools:
 
 ```bash
 node --version
 pnpm --version
+docker --version
+docker compose version
 ```
 
-The repository pins the package-manager version through `package.json`.
-
-The current expected versions are:
-
-```text
-Node.js: 22+
-pnpm:    10.15.0
-```
-
----
+The repository pins the pnpm version in `package.json`. CI uses Node.js 22 and PostgreSQL 17.
 
 ## Getting Started
 
-### 1. Clone the repository
-
-Clone the repository and enter the project directory:
+### 1. Clone and install
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/jorgefochezato-gif/opshub.git
 cd opshub
-```
-
-### 2. Verify the environment
-
-```bash
-node --version
-pnpm --version
-```
-
-### 3. Install dependencies
-
-From the repository root:
-
-```bash
 pnpm install
 ```
 
-The `pnpm-lock.yaml` file ensures that dependency resolution is reproducible.
-
-### 4. Verify the workspace
-
-List the packages recognized by pnpm:
-
-```bash
-pnpm -r list --depth -1
-```
-
-List the packages recognized by Turborepo:
-
-```bash
-pnpm turbo ls
-```
-
-The workspace should contain:
-
-```text
-@opshub/api
-@opshub/web
-@opshub/config
-@opshub/types
-```
-
----
-
-## Environment Variables
-
-Environment-specific values must not be committed to Git.
-
-The repository provides:
-
-```text
-.env.example
-```
-
-as the template for required environment variables.
-
-Create a local environment file when environment variables are required:
+### 2. Configure the local environment
 
 ```bash
 cp .env.example .env
 ```
 
-Never commit `.env` or other files containing real secrets.
+The development template defines:
 
-Verify that environment files are ignored:
-
-```bash
-git check-ignore -v .env
+```text
+DATABASE_URL="postgresql://opshub:opshub_dev@localhost:5432/opshub?schema=public"
 ```
 
-The expected result should indicate that `.env` is ignored by `.gitignore`.
+The credentials are for the local Docker Compose service only. Never commit real secrets or a populated environment file.
 
----
-
-## Development Commands
-
-All project-level commands should be executed from the repository root.
-
-### Install dependencies
+### 3. Start PostgreSQL
 
 ```bash
-pnpm install
+docker compose up -d postgres
+docker compose ps
 ```
 
-### Run development tasks
+### 4. Generate the Prisma client
 
 ```bash
-pnpm dev
+pnpm --filter @opshub/database db:generate
 ```
 
-### Run linting
+### 5. Apply the committed migrations
+
+```bash
+pnpm --filter @opshub/database exec prisma migrate deploy
+pnpm --filter @opshub/database exec prisma migrate status
+```
+
+The current migration history creates the relational model and the ordered task-pagination index.
+
+### 6. Seed deterministic development data
+
+```bash
+pnpm --filter @opshub/database db:seed
+```
+
+Expected records:
+
+```text
+Organizations: 2
+Users:         5
+Memberships:   6
+Projects:      4
+Tasks:        12
+```
+
+The seed is idempotent and can be run repeatedly without creating duplicate records.
+
+### 7. Run representative database queries
+
+```bash
+pnpm --filter @opshub/database db:queries
+```
+
+The query runner demonstrates organization-scoped lookups, membership and project retrieval, task filtering, and offset and cursor pagination.
+
+## Available Commands
+
+Run repository-wide quality checks from the repository root:
 
 ```bash
 pnpm lint
-```
-
-### Run TypeScript type checking
-
-```bash
 pnpm typecheck
+pnpm format:check
 ```
 
-### Format the repository
+Format tracked source and documentation files:
 
 ```bash
 pnpm format
 ```
 
-### Check formatting without modifying files
+Database commands:
 
 ```bash
-pnpm format:check
+pnpm --filter @opshub/database db:generate
+pnpm --filter @opshub/database db:migrate
+pnpm --filter @opshub/database db:seed
+pnpm --filter @opshub/database db:queries
+pnpm --filter @opshub/database db:studio
 ```
 
-### Run the build
+`db:migrate` is intended for creating and applying migrations during schema development. Use `prisma migrate deploy` when validating the committed migration history on a clean database or in CI.
 
-```bash
-pnpm build
-```
+There is currently no root `dev`, `build`, or `test` script. Those commands will be added only when the applicable workspaces have runnable implementations or test suites.
 
----
+## Continuous Integration
 
-## Turborepo
+GitHub Actions runs the `Quality gate` job for every pull request and every push to `main`. It:
 
-OpsHub uses Turborepo to orchestrate tasks across the monorepo.
+1. Installs dependencies from the lockfile.
+2. Generates the Prisma client.
+3. Checks formatting.
+4. Runs linting.
+5. Runs TypeScript type checking.
+6. Applies migrations to a clean PostgreSQL 17 database.
+7. Verifies migration status.
+8. Runs the deterministic seed twice to verify repeatability.
 
-For example:
+The workflow is defined in [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
-```bash
-pnpm turbo run lint
-```
+## GitHub Delivery Workflow
 
-runs the `lint` task in the applicable workspace packages.
-
-To inspect the packages discovered by Turborepo:
-
-```bash
-pnpm turbo ls
-```
-
-To preview the tasks that Turborepo would execute:
-
-```bash
-pnpm turbo run typecheck --dry
-```
-
-The root `turbo.json` defines the task graph and caching behavior.
-
----
-
-## TypeScript
-
-The repository uses a shared TypeScript configuration:
+Meaningful work follows this sequence:
 
 ```text
-tsconfig.base.json
-```
-
-Individual applications and packages extend the shared configuration.
-
-TypeScript is configured using strict type checking and additional safety-oriented compiler options.
-
-Run type checking across the workspace:
-
-```bash
-pnpm typecheck
-```
-
-A successful result should report all workspace typecheck tasks as successful.
-
----
-
-## ESLint
-
-ESLint provides the project's JavaScript and TypeScript linting rules.
-
-The repository uses a single root configuration:
-
-```text
-eslint.config.mjs
-```
-
-Run ESLint across the repository:
-
-```bash
-pnpm exec eslint .
-```
-
-Or run the workspace lint task:
-
-```bash
-pnpm lint
-```
-
-Linting should complete without errors.
-
----
-
-## Prettier
-
-Prettier provides the project's formatting standard.
-
-The repository uses:
-
-```text
-prettier.config.mjs
-```
-
-Format the repository:
-
-```bash
-pnpm format
-```
-
-Check formatting without changing files:
-
-```bash
-pnpm format:check
-```
-
-Formatting must pass before a pull request is considered ready for merge.
-
----
-
-## Git Workflow
-
-The `main` branch is protected.
-
-Development should be performed using feature branches.
-
-The general workflow is:
-
-```text
-main
- │
- └── feature branch
-       │
-       ├── make changes
-       ├── run validation
-       ├── commit
-       ├── push
-       └── open pull request
-                    │
-                    ▼
-             CI / review checks
-                    │
-                    ▼
-              merge into main
-```
-
-### Create a feature branch
-
-Create a branch from an up-to-date `main` branch:
-
-```bash
-git switch main
-git pull
-git switch -c feat/<short-description>
-```
-
-Examples:
-
-```text
-feat/project-foundation
-feat/database-schema
-feat/authentication
-feat/user-management
-fix/api-validation
-chore/update-dependencies
-docs/update-architecture
-```
-
-### Check repository status
-
-```bash
-git status
-```
-
-### Review changes
-
-```bash
-git diff
-```
-
-For staged changes:
-
-```bash
-git diff --cached
-```
-
-### Stage changes
-
-```bash
-git add <file>
-```
-
-Or stage all intended changes:
-
-```bash
-git add .
-```
-
-Always review the staged changes before committing:
-
-```bash
-git diff --cached
-```
-
-### Commit changes
-
-Commits should describe the purpose of the change.
-
-Examples:
-
-```bash
-git commit -m "feat: add user authentication"
-git commit -m "fix: validate tenant identifier"
-git commit -m "chore: update dependencies"
-git commit -m "docs: update architecture documentation"
-```
-
-### Push a feature branch
-
-```bash
-git push -u origin <branch-name>
-```
-
-### Create a pull request
-
-Open a pull request from the feature branch into `main`.
-
-The pull request should include:
-
-- What changed
-- Why the change was necessary
-- How it was tested
-- Any relevant architectural considerations
-- Any known limitations
-
----
-
-## Validation Before a Pull Request
-
-Before opening a pull request, run the project validation commands from the repository root:
-
-```bash
-pnpm install
-pnpm lint
-pnpm typecheck
-pnpm format:check
-```
-
-If a build task is configured for the affected packages, also run:
-
-```bash
-pnpm build
-```
-
-Check the working tree:
-
-```bash
-git status
-```
-
-Review the staged changes:
-
-```bash
-git diff --cached
-```
-
-Check for whitespace errors:
-
-```bash
-git diff --cached --check
-```
-
-No secret values should be committed.
-
----
-
-## Pull Request Rules
-
-Pull requests should:
-
-1. Target `main`.
-2. Use a descriptive title.
-3. Explain the purpose of the change.
-4. Include testing or validation performed.
-5. Pass required CI checks.
-6. Receive the required review.
-7. Avoid unrelated changes.
-8. Keep commits and changes reasonably focused.
-
-The protected `main` branch should only receive changes through the documented pull-request workflow.
-
----
-
-## Commit Conventions
-
-OpsHub uses conventional-style commit prefixes.
-
-Common prefixes include:
-
-```text
-feat:     New functionality
-fix:      Bug fix
-chore:    Maintenance or tooling
-docs:     Documentation
-refactor: Code restructuring without behavior change
-test:     Tests
-build:    Build-system changes
-ci:       CI/CD changes
-security: Security-related changes
-```
-
-Examples:
-
-```text
-feat: add tenant management
-fix: handle invalid API request
-chore: configure TypeScript
-docs: update development workflow
-test: add authentication tests
-ci: add pull request checks
-```
-
----
-
-# Phase 1: Repository & Development Foundation
-
-## Objective
-
-Establish a reproducible local development environment and disciplined Git workflow.
-
-## Primary Technologies
-
-- Git
-- GitHub
-- pnpm
-- Turborepo
-- TypeScript
-- ESLint
-- Prettier
-
-## Execution Checklist
-
-- [x] Create the GitHub repository and protect the main branch.
-- [x] Initialize the pnpm monorepo and Turborepo workspace.
-- [x] Create `apps/web`, `apps/api`, and the initial shared packages.
-- [x] Configure TypeScript strict mode and shared tsconfig.
-- [x] Configure ESLint and Prettier with a single project standard.
-- [x] Create `.env.example` and document required local variables.
-- [x] Add a root README with architecture, setup, commands, and contribution rules.
-- [ ] Create GitHub issue labels and a project board for the 20 phases.
-- [ ] Create the first pull request and merge it through the documented workflow.
-
-## Phase 1 Deliverables
-
-- Working monorepo with one-command dependency installation.
-- Root-level development and validation commands.
-- Initial application and shared-package structure.
-- Initial architecture documentation.
-- `CONTRIBUTING.md`.
-- Branch and pull-request conventions.
-- CI-ready repository skeleton.
-- First green pull request merged through the protected `main` branch.
-
----
-
-## Definition of Done / Release Gate
-
-Phase 1 is complete when:
-
-- [ ] A fresh clone works on a clean machine following the README instructions.
-- [ ] Dependencies install successfully with `pnpm install`.
-- [ ] Lint succeeds from the repository root.
-- [ ] TypeScript type checking succeeds from the repository root.
-- [ ] Formatting checks succeed from the repository root.
-- [ ] Build succeeds where applicable.
-- [ ] No secret values are committed.
-- [ ] `main` is protected.
-- [ ] Required pull-request checks pass.
-- [ ] The first pull request is successfully merged through the documented workflow.
-
----
-
-## Project Development Philosophy
-
-OpsHub is intentionally being built incrementally.
-
-Each phase should produce a working, verifiable state rather than accumulating a large amount of untested infrastructure.
-
-The preferred workflow is:
-
-```text
-Plan
+Roadmap
   ↓
-Implement
+GitHub issue added to the project
   ↓
-Validate locally
+Status: In Progress
   ↓
-Commit
+Focused branch and local validation
   ↓
-Push feature branch
+Pull request linked to the issue
   ↓
-Pull request
+Status: In Review
   ↓
-CI validation
+Required CI and review
   ↓
-Code review
+Merge through protected main
   ↓
-Merge
+Issue closed and project status: Done
   ↓
-Update project documentation
+Local main synchronized and temporary resources removed
 ```
 
-The project prioritizes:
+Do not bypass the issue, project, pull-request, or release process because the project currently has one developer. Detailed conventions are in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Documentation
+
+- [Architecture overview](docs/architecture/README.md)
+- [Relational database design](docs/architecture/database-design.md)
+- [Database performance findings](docs/architecture/database-performance.md)
+- [Local database backup and restore](docs/architecture/database-backup-restore.md)
+- [Contribution and release workflow](CONTRIBUTING.md)
+
+## Development Principles
+
+OpsHub prioritizes:
 
 - Reproducibility
 - Simplicity
@@ -710,10 +278,8 @@ The project prioritizes:
 - Clear documentation
 - Incremental delivery
 
----
+Each phase must produce a working, verifiable state and complete the repository release process before the next phase begins.
 
 ## License
 
-This project is currently a personal learning and portfolio project.
-
-License information will be added when the project's distribution model is finalized.
+This project is currently a personal learning and portfolio project. License information will be added when the distribution model is finalized.
